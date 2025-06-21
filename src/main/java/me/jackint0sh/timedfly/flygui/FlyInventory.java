@@ -9,6 +9,7 @@ import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryType;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
+import net.kyori.adventure.text.Component;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -38,24 +39,31 @@ public class FlyInventory {
     }
 
     public FlyInventory(InventoryType inventoryType, String title) {
-        this.inventory = Bukkit.createInventory(null, inventoryType, MessageUtil.color(title));
+      //  this.inventory = Bukkit.createInventory(null, inventoryType, MessageUtil.color(title));
+
+        this.inventory = Bukkit.createInventory(null, inventoryType, Component.text(MessageUtil.color(title)));
+
         FlyInventory.inventories.put(MessageUtil.color(title), this);
     }
 
     public FlyInventory addItem(Item itemStack) {
-        this.inventory.addItem(itemStack);
+        this.inventory.addItem(itemStack.build());
         this.items.put(items.size() - (items.size() == 0 ? 0 : 1), itemStack);
         return this;
     }
 
     public FlyInventory addItems(Item... itemStack) {
-        this.inventory.addItem(itemStack);
+        //this.inventory.addItem(itemStack.build());
+        for (Item item : itemStack) {
+            this.inventory.addItem(item.build());
+        }
+
         for (Item item : itemStack) this.items.put(items.size() - (items.size() == 0 ? 0 : 1), item);
         return this;
     }
 
     public void setItem(Item itemStack, int slot) {
-        this.inventory.setItem(slot, itemStack);
+        this.inventory.setItem(slot, itemStack.build());
         this.items.put(slot, itemStack);
     }
 
@@ -69,7 +77,7 @@ public class FlyInventory {
             throw new IndexOutOfBoundsException("Could not find the location provided on the inventory.");
         }
 
-        this.inventory.setItem(location, itemStack);
+        this.inventory.setItem(location, itemStack.build());
         this.items.put(location, itemStack);
     }
 
@@ -77,7 +85,7 @@ public class FlyInventory {
         this.items.clear();
         for (int i = 0; i < itemStack.length; i++) {
             Item item = itemStack[i];
-            this.inventory.setItem(i, item);
+            this.inventory.setItem(i, item.build());
             this.items.put(i, item);
         }
         return this;
@@ -117,7 +125,7 @@ public class FlyInventory {
         if (e instanceof InventoryCloseEvent) {
             Arrays.stream(this.getInventory().getContents())
                     .filter(Objects::nonNull)
-                    .filter(itemStack -> !ServerVersion.getSupportedVersion().hasTag(itemStack, "customitem"))
+                    .filter(itemStack -> !ServerVersion.INSTANCE.hasTag(itemStack, "customitem"))
                     .forEach(item -> {
                         Player player = (Player) ((InventoryCloseEvent) e).getPlayer();
                         Map<Integer, ItemStack> contents = player.getInventory().addItem(item);

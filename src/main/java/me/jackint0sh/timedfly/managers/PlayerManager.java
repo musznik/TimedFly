@@ -9,7 +9,9 @@ import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.craftbukkit.libs.jline.internal.Nullable;
+
+import org.jetbrains.annotations.Nullable;
+
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitTask;
 
@@ -71,6 +73,7 @@ public class PlayerManager {
     public void startTimer() {
         if (this.player.isOnline())
             this.player.setAllowFlight(true);
+
         if (!this.isOnFloor()) {
             this.fromPlugin = true;
             this.timeRunning = true;

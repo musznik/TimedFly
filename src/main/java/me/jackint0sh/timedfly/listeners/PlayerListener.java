@@ -98,6 +98,7 @@ public class PlayerListener implements Listener {
         }
     }
 
+
     @EventHandler
     public void onFlightToggle(PlayerToggleFlightEvent event) {
         if (event.isCancelled()) return;

@@ -2,6 +2,7 @@ package me.jackint0sh.timedfly.flygui;
 
 import me.jackint0sh.timedfly.utilities.MessageUtil;
 import me.jackint0sh.timedfly.versions.ServerVersion;
+
 import org.bukkit.Material;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
@@ -18,8 +19,9 @@ import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-public class Item extends ItemStack {
-
+public class Item  {
+    private final ItemStack baseItem;
+    private final ItemMeta meta;
     private Set<ItemFlag> itemFlags;
     private ItemMeta itemMeta;
     private String name;
@@ -36,13 +38,15 @@ public class Item extends ItemStack {
         this(Material.valueOf(flyItem.getMaterial().toUpperCase()));
         this.setLore(flyItem.getLore());
         this.setName(flyItem.getName());
-        this.setDurability((short) flyItem.getData());
-        this.setAmount(flyItem.getAmount());
+        baseItem.setDurability((short) flyItem.getData());
+        baseItem.setAmount(flyItem.getAmount());
         this.setKey(flyItem.getKey());
     }
 
     public Item setKey(String key) {
-        ServerVersion.getSupportedVersion().setNBT(this, "key", key);
+        ServerVersion.INSTANCE.setNBT(baseItem, "key", key);
+
+       // ServerVersion.getSupportedVersion().setNBT(this, "key", key);
         return this;
     }
 
@@ -51,13 +55,13 @@ public class Item extends ItemStack {
     }
 
     public Item(Material material) {
-        super(ServerVersion.getSupportedVersion().setNBT(new ItemStack(material), "customitem", "true"));
-        loadItem();
+        this.baseItem = new ItemStack(material);
+        this.meta = baseItem.getItemMeta();
     }
 
     public Item(ItemStack itemStack) {
-        super(itemStack);
-        loadItem();
+        this.baseItem = itemStack.clone(); // bezpieczna kopia
+        this.meta = baseItem.getItemMeta();
     }
 
     public boolean toggled() {
@@ -70,7 +74,7 @@ public class Item extends ItemStack {
     }
 
     private void loadItem() {
-        this.itemMeta = this.getItemMeta();
+        this.itemMeta = baseItem.getItemMeta();
         this.itemFlags = itemMeta.getItemFlags();
         this.name = itemMeta.getDisplayName();
         this.lore = itemMeta.getLore();
@@ -78,7 +82,7 @@ public class Item extends ItemStack {
 
     public Item addItemFlag(ItemFlag itemFlag) {
         this.itemFlags.add(itemFlag);
-        this.setItemMeta(this.itemMeta);
+        baseItem.setItemMeta(this.itemMeta);
         return this;
     }
 
@@ -92,9 +96,7 @@ public class Item extends ItemStack {
     }
 
     public Item setName(String name) {
-        this.name = MessageUtil.color(name);
-        this.itemMeta.setDisplayName(this.name);
-        this.setItemMeta(this.itemMeta);
+        meta.setDisplayName(name); // możesz użyć MessageUtil.color(name)
         return this;
     }
 
@@ -103,9 +105,7 @@ public class Item extends ItemStack {
     }
 
     public Item setLore(List<String> lore) {
-        this.lore = lore.stream().map(MessageUtil::color).collect(Collectors.toList());
-        this.itemMeta.setLore(this.lore);
-        this.setItemMeta(this.itemMeta);
+        meta.setLore(lore); // lub użyj NBT-API / Adventure, jeśli chcesz
         return this;
     }
 
@@ -121,24 +121,24 @@ public class Item extends ItemStack {
     }
 
     public Item setMaterial(Material material) {
-        this.setType(material);
+        baseItem.setType(material);
         return this;
     }
 
     public Item glow(boolean b) {
         if (b) {
-            this.addUnsafeEnchantment(Enchantment.DURABILITY, 1);
+            baseItem.addUnsafeEnchantment(Enchantment.UNBREAKING, 1);
             this.addItemFlag(ItemFlag.HIDE_ENCHANTS);
-        } else this.removeEnchantment(Enchantment.DURABILITY);
+        } else baseItem.removeEnchantment(Enchantment.UNBREAKING);
         return this;
     }
 
     public void give(Player player) {
-        player.getInventory().addItem(this);
+        player.getInventory().addItem(baseItem);
     }
 
     public void give(Player player, int slot) {
-        player.getInventory().setItem(slot, this);
+        player.getInventory().setItem(slot, baseItem);
     }
 
     public Item addLoreLine(String line) {
@@ -222,6 +222,11 @@ public class Item extends ItemStack {
             if (this.shiftLeftClickConsumer != null && event.getClick().isShiftClick() && event.getClick().isLeftClick())
                 this.shiftLeftClickConsumer.accept(event);
         }
+    }
+
+    public ItemStack build() {
+        baseItem.setItemMeta(itemMeta);
+        return baseItem;
     }
 
 }

@@ -5,7 +5,9 @@ import me.jackint0sh.timedfly.utilities.MessageUtil;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
-import org.bukkit.craftbukkit.libs.jline.internal.Nullable;
+//import org.bukkit.craftbukkit.libs.jline.internal.Nullable;
+import org.jetbrains.annotations.Nullable;
+
 import org.bukkit.entity.Player;
 
 import java.io.BufferedReader;

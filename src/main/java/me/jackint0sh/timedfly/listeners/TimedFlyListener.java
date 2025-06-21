@@ -35,7 +35,7 @@ public class TimedFlyListener implements Listener {
 
         if (Config.getConfig("config").get().getBoolean("Messages.ActionBar") && playerManager.getTimeLeft() > 0) {
             if (translate != null) {
-                ServerVersion.getSupportedVersion().sendActionBar(player, translate.replace("[time_left]", timeLeft));
+                ServerVersion.INSTANCE.sendActionBar(player, translate.replace("[time_left]", timeLeft));
             }
         }
 
@@ -53,7 +53,7 @@ public class TimedFlyListener implements Listener {
                 }
                 if (subtitle == null) subtitle = "";
 
-                ServerVersion.getSupportedVersion().sendTitle(player,
+                ServerVersion.INSTANCE.sendTitle(player,
                         title.replace("[time_left]", timeLeft),
                         subtitle.replace("[time_left]", timeLeft),
                         0, 45, 0
@@ -92,11 +92,11 @@ public class TimedFlyListener implements Listener {
         }
 
         if (Config.getConfig("config").get().getBoolean("Messages.ActionBar")) {
-            ServerVersion.getSupportedVersion().sendActionBar(player, action_bar);
+            ServerVersion.INSTANCE.sendActionBar(player, action_bar);
         }
 
         if (Config.getConfig("config").get().getBoolean("Messages.Title")) {
-            ServerVersion.getSupportedVersion().sendTitle(player, title, subtitle);
+            ServerVersion.INSTANCE.sendTitle(player, title, subtitle);
         }
 
         if (Config.getConfig("config").get().getBoolean("Messages.Chat")) {
