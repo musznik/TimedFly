@@ -104,7 +104,6 @@ public class TimedFlyListener implements Listener {
         }
 
         InventoryListener.runCommands(FlyItem.getConfigItem(event.getItemKey()), "onFlyDisable", player);
-
         PlayerListener.handlePlayerQuery(playerManager, true);
         playerManager.setFromPlugin(false);
     }

@@ -87,13 +87,19 @@ public class PlayerListener implements Listener {
 
         PlayerManager playerManager = PlayerManager.getCachedPlayer(player.getUniqueId());
         if (playerManager == null || !playerManager.isFromPlugin()) return;
-
-        if (player.isOnGround()) {
+        if (player.isOnGround())
+        {
             playerManager.setOnFloor(true);
             if (!Config.getConfig("config").get().getBoolean("StopTimerOn.Ground")) return;
+
             if (playerManager.hasTime() && !playerManager.isAttacking()) {
-                if (!player.getAllowFlight()) player.setAllowFlight(true);
-                if (playerManager.isTimeRunning()) playerManager.setTimeRunning(false);
+                if (!player.getAllowFlight()) {
+                    player.setAllowFlight(true);
+                }
+
+                if (playerManager.isTimeRunning()) {
+                    playerManager.setTimeRunning(false);
+                }
             }
         }
     }
@@ -130,6 +136,7 @@ public class PlayerListener implements Listener {
         PlayerManager playerManager = PlayerManager.getCachedPlayer(player.getUniqueId());
 
         if (playerManager != null) {
+            MessageUtil.sendConsoleMessage("trying to create db player");
             if (!handlePlayerQuery(playerManager, false)) {
                 MessageUtil.sendError("Could not handle player's data.");
             }
@@ -183,19 +190,21 @@ public class PlayerListener implements Listener {
                 }
             });
         } else {
-            database.select("*", "UUID", playerManager.getPlayerUuid().toString(), (e, r) -> {
+            database.select("*", "UUID", playerManager.getPlayerUuid().toString(), (e, r) ->
+            {
                 if (e != null) {
-                    e.printStackTrace();
+                    MessageUtil.sendError(e.getMessage());
                     bool.set(false);
+                    return;
+                }
 
-                    if (r == null || r.isEmpty()) {
-                        database.insert(keys, values, (error, result) -> {
-                            if (error != null) {
-                                error.printStackTrace();
-                                bool.set(false);
-                            }
-                        });
-                    }
+                if (r == null || r.isEmpty()) {
+                    database.insert(keys, values, (error, result) -> {
+                        if (error != null) {
+                            MessageUtil.sendError(error.getMessage());
+                            bool.set(false);
+                        }
+                    });
                     return;
                 }
 
